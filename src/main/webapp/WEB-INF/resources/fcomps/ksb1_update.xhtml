@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['err.lazy.filter.norecs']}" rendered="#{empty ksb1.list.wrappedData}"/>
+    <p:panelGrid id="panel" rendered="#{not empty ksb1.list.wrappedData}">
+        <f:facet name="header">
+            <p:row>
+                <p:column colspan="3" style="text-align: left;">
+                    <p:messages closable="true"/>
+                </p:column>
+            </p:row>
+            <p:row>
+                <p:column>
+                    <h:outputText value="#{uimess['col.camp']}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{uimess['col.valoare']}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{uimess['col.empty']}"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.kostl']}" for="kostl"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="kostl" value="#{ksb1.updateValues.cost_center.value}" size="10" maxlength="10"
+                             validatorMessage="#{uimess['col.kostl']}: #{uimess['valid.10numbers']}">
+                    <f:validateLength minimum="10" maximum="10"/>
+                    <f:validateRegex pattern="[0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="kostl_empty" value="#{ksb1.updateValues.cost_center.goleste}"
+                                         rendered="#{not ksb1.updateValues.cost_center.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.obj_txt']}" for="obj_txt"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="obj_txt" value="#{ksb1.updateValues.cost_center_nume.value}" size="30" maxlength="100"
+                             validatorMessage="#{uimess['col.obj_txt']}: #{uimess['valid.1to100chars']}">
+                    <f:validateLength minimum="1" maximum="100"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="obj_txt_empty" value="#{ksb1.updateValues.cost_center_nume.goleste}"
+                                         rendered="#{not ksb1.updateValues.cost_center_nume.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.vbund']}" for="vbund"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="vbund" value="#{ksb1.updateValues.ic_partener.value}" size="5" maxlength="5"
+                             validatorMessage="#{uimess['col.vbund']}: #{uimess['valid.1to5digits']}">
+                    <f:validateLength minimum="1" maximum="5"/>
+                    <f:validateRegex pattern="[0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="vbund_empty" value="#{ksb1.updateValues.ic_partener.goleste}"
+                                         rendered="#{not ksb1.updateValues.ic_partener.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.pobart']}" for="pobart"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="pobart" value="#{ksb1.updateValues.obj_part_tip.value}" size="3" maxlength="3"
+                             validatorMessage="#{uimess['col.pobart']}: #{uimess['valid.3capit']}">
+                    <f:validateLength minimum="3" maximum="3"/>
+                    <f:validateRegex pattern="[A-Z]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="pobart_empty" value="#{ksb1.updateValues.obj_part_tip.goleste}"
+                                         rendered="#{not ksb1.updateValues.obj_part_tip.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.pobid']}" for="pobid"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="pobid" value="#{ksb1.updateValues.obj_part_cod.value}" size="30" maxlength="35"
+                             validatorMessage="#{uimess['col.pobid']}: 1 - 35 characters!">
+                    <f:validateLength minimum="1" maximum="35"/>
+                    <f:validateRegex pattern="[A-Za-z0-9._]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="pobid_empty" value="#{ksb1.updateValues.obj_part_cod.goleste}"
+                                         rendered="#{not ksb1.updateValues.obj_part_cod.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.pob_txt']}" for="pob_txt"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="pob_txt" value="#{ksb1.updateValues.obj_part_nume.value}" size="30" maxlength="100"
+                             validatorMessage="#{uimess['col.pob_txt']}: #{uimess['valid.1to100chars']}">
+                    <f:validateLength minimum="1" maximum="100"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="pob_txt_empty" value="#{ksb1.updateValues.obj_part_nume.goleste}"
+                                         rendered="#{not ksb1.updateValues.obj_part_nume.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.objnr_n1']}" for="objnr_n1"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="objnr_n1" value="#{ksb1.updateValues.aux_obj.value}" size="30" maxlength="35"
+                             validatorMessage="#{uimess['col.objnr_n1']}: 1 - 35 characters!">
+                    <f:validateLength minimum="1" maximum="35"/>
+                    <f:validateRegex pattern="[A-Za-z0-9._]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="objnr_n1_empty" value="#{ksb1.updateValues.aux_obj.goleste}"
+                                         rendered="#{not ksb1.updateValues.aux_obj.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.vrgng']}" for="vrgng"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="vrgng" value="#{ksb1.updateValues.buss_tranz.value}" size="4" maxlength="4"
+                             validatorMessage="#{uimess['col.vrgng']}: #{uimess['valid.4capitornumb']}">
+                    <f:validateLength minimum="4" maximum="4"/>
+                    <f:validateRegex pattern="[A-Z0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="vrgng_empty" value="#{ksb1.updateValues.buss_tranz.goleste}"
+                                         rendered="#{not ksb1.updateValues.buss_tranz.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.orgvg']}" for="orgvg"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="orgvg" value="#{ksb1.updateValues.orig_tranz.value}" size="4" maxlength="4"
+                             validatorMessage="#{uimess['col.orgvg']}: #{uimess['valid.4capitornumb']}">
+                    <f:validateLength minimum="4" maximum="4"/>
+                    <f:validateRegex pattern="[A-Z0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="orgvg_empty" value="#{ksb1.updateValues.orig_tranz.goleste}"
+                                         rendered="#{not ksb1.updateValues.orig_tranz.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.blart']}" for="blart"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="blart" value="#{ksb1.updateValues.doc_tip.value}" size="2" maxlength="2"
+                            validatorMessage="#{uimess['col.blart']}: #{uimess['valid.2capitornumb']}">
+                    <f:validateLength minimum="2" maximum="2"/>
+                    <f:validateRegex pattern="[A-Z0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="blart_empty" value="#{ksb1.updateValues.doc_tip.goleste}"
+                                         rendered="#{not ksb1.updateValues.doc_tip.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.kstar']}" for="kstar"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="kstar" value="#{ksb1.updateValues.cont.value}" size="10" maxlength="10"
+                             validatorMessage="#{uimess['col.kstar']}: #{uimess['valid.10numbers']}">
+                    <f:validateLength minimum="10" maximum="10"/>
+                    <f:validateRegex pattern="[0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="kstar_empty" value="#{ksb1.updateValues.cont.goleste}"
+                                         rendered="#{not ksb1.updateValues.cont.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.cel_ktxt']}" for="cel_ktxt"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="cel_ktxt" value="#{ksb1.updateValues.cont_nume.value}" size="30" maxlength="100"
+                             validatorMessage="#{uimess['col.cel_ktxt']}: #{uimess['valid.1to100chars']}">
+                    <f:validateLength minimum="1" maximum="100"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="cel_ktxt_empty" value="#{ksb1.updateValues.cont_nume.goleste}"
+                                         rendered="#{not ksb1.updateValues.cont_nume.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.bltxt']}" for="bltxt"/>
+            </p:column>
+            <p:column>
+                <p:inputTextarea id="bltxt" value="#{ksb1.updateValues.doc_header.value}" cols="30" rows="3" maxlength="1000"/>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="bltxt_empty" value="#{ksb1.updateValues.doc_header.goleste}"
+                                         rendered="#{not ksb1.updateValues.doc_header.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.sgtxt']}" for="sgtxt"/>
+            </p:column>
+            <p:column>
+                <p:inputTextarea id="sgtxt" value="#{ksb1.updateValues.doc_nume.value}" cols="30" rows="3" maxlength="1000"/>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="sgtxt_empty" value="#{ksb1.updateValues.doc_nume.goleste}"
+                                         rendered="#{not ksb1.updateValues.doc_nume.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.matnr']}" for="matnr"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="matnr" value="#{ksb1.updateValues.material.value}" size="10" maxlength="10"
+                             validatorMessage="#{uimess['col.matnr']}: #{uimess['valid.10numbers']}">
+                    <f:validateLength minimum="10" maximum="10"/>
+                    <f:validateRegex pattern="[0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="matnr_empty" value="#{ksb1.updateValues.material.goleste}"
+                                         rendered="#{not ksb1.updateValues.material.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.mat_txt']}" for="mat_txt"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="mat_txt" value="#{ksb1.updateValues.material_nume.value}" size="30" maxlength="100"
+                             validatorMessage="#{uimess['col.mat_txt']}: #{uimess['valid.1to100chars']}">
+                    <f:validateLength minimum="1" maximum="100"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="mat_txt_empty" value="#{ksb1.updateValues.material_nume.goleste}"
+                                         rendered="#{not ksb1.updateValues.material_nume.obligatoriu}"/>
+            </p:column>
+        </p:row>
+
+        <f:facet name="footer">
+            <p:row>
+                <p:column colspan="3">
+                    <p:commandButton id="update-filter" widgetVar="dialog-update-filter" value="#{uimess['lazy.btn.upd.filter']}" icon="fa fa-save" action="#{ksb1.updateByFilter()}"
+                                     update="panel" onstart="startUpdate();" oncomplete="endUpdate();"/>
+                    <p:commandButton id="update-select" widgetVar="dialog-update-select" value="#{uimess['lazy.btn.upd.select']}" icon="fa fa-save" action="#{ksb1.updateSelected()}"
+                                     rendered="#{not empty ksb1.selected}" update="panel" onstart="startUpdate();" oncomplete="endUpdate();"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+    </p:panelGrid>
+    <script type="text/javascript">        
+        function startUpdate(){
+            jQuery('#fdlg\\:progress').show();
+            PF('dialog-update-filter').disable();
+            if (jQuery("#fdlg\\:update-select").length > 0) { PF('dialog-update-select').disable(); }
+        }
+        
+        function endUpdate(){
+            PF('dialog-update-filter').enable();
+            if (jQuery("#fdlg\\:update-select").length > 0) { PF('dialog-update-select').enable(); }
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        }
+        
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+    </script>
+</ui:composition>

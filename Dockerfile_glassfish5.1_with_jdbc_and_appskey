@@ -1,0 +1,5 @@
+FROM mcr.microsoft.com/java/jre-headless:8u212-zulu-alpine-with-tools
+COPY glassfish5 /usr/local/glassfish5
+COPY mssql-jdbc-8.4.1.jre8.jar /usr/local/glassfish5/glassfish/lib
+ENV APPS_KEY=<removed>
+EXPOSE 8080

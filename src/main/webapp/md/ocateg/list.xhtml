@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    
+    <ui:define name='metadata'/>
+    <ui:define name="browser-title">#{uimess['ocateg.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['ocateg.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+    
+    <ui:define name="content">
+        <style>
+            .ui-breadcrumb .ui-icon-home{
+                background-image: url(#{resource['images/home1_32px.png']});
+                background-position: 0;
+                background-size: 1.2em;
+            }
+        </style>
+        <h:form id="breadcrumb">
+            <p:breadCrumb>
+                <p:menuitem title="#{uimess['mess.selectie']}" value="#{uimess['mess.selectie']}" action="#{ocateglist.navigate('index')}"
+                            ajax="false" style="text-decoration: none;"/>
+                <p:menuitem value="#{uimess['mess.lista']}" url="javascript:void(0)" style="font-weight: bold; color: black;"/>
+            </p:breadCrumb>
+        </h:form>
+        
+        <c:if test="#{not empty ocateglist.initError}">
+            <p:staticMessage severity="warn" detail="#{ocateglist.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty ocateglist.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+            </style>
+
+            <h:form id="selection">
+                <p:panelGrid id="panel">                                        
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                            <p:outputLabel value="#{uimess['col.cdriver']}: " />
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{ocateglist.cdriver.cod} #{ocateglist.cdriver.cod}"/>
+                        </p:column>
+                    </p:row>                    
+                </p:panelGrid>
+            </h:form>
+            
+            <p:panel id="panel_info" style="margin-bottom: 0.5em;" header="Info" closable="true">
+                <h3 style="white-space: pre-line; margin: 0 0 0.5em 0;">#{uimess['ocateg.info']}</h3>
+                <h:outputText value="Link: "/>
+                <p:link target="_blank" href="#{planappurl.valoare}/md/ocateg/?lang=#{portal_lang.language}"
+                        value="#{planappurl.valoare}/md/ocateg/"/>
+            </p:panel>
+
+            <h:form id='list'>
+                <p:menubar style="margin-bottom: 2px;">
+                    <p:menuitem id="menu-refresh" title="#{uimess['mess.rfrsh.title']}" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh"
+                                oncomplete="init();"/>
+                    <p:menuitem id="menu-reset" title="#{uimess['mess.reset.title']}" value="#{uimess['mess.reset']}" icon="fa fa-filter"
+                                    url="javascript:void(0)" onclick="PF('block').show(); PF('tabela').clearFilters();"/>
+                    
+                    <p:submenu label="XLSX" icon="fa fa-download">
+                        <p:menuitem id="menu-download-specific" title="#{uimess['ocateg.btn.dwnspf.title']}" value="#{uimess['ocateg.btn.dwnspf.value']}" ajax="false"
+                                    action="#{ocateglist.exportByCdriver()}" onclick='PrimeFaces.monitorDownload(downloadStart, downloadEnd);'/>
+                        <p:menuitem id="menu-download-all" title="#{uimess['ocateg.btn.dwnall.title']}" value="#{uimess['ocateg.btn.dwnall.value']}" ajax="false"
+                                    action="#{ocateglist.exportAll()}" onclick='PrimeFaces.monitorDownload(downloadStart, downloadEnd);'/>
+                    </p:submenu>
+                </p:menubar>
+
+                <p:dataTable id='tabela' widgetVar="tabela" value='#{ocateglist.list}' var='item' sortBy="#{item.nume}" filteredValue="#{ocateglist.filtered}"
+                             selectionMode="single" selection="#{ocateglist.selected}" rowKey="#{item.cod}" reflow="true">
+                    <p:ajax event="filter" ignoreAutoUpdate="true" oncomplete="tableEndUpdate();"/>
+
+                    <p:column headerText="#{uimess['col.cod']}" filterBy="#{item.cod}" filterMatchMode="contains" filterValue="#{ocateglist.filterValues[0]}"
+                              filterMaxLength="5" filterStyle="width: 5em;">
+                        <h:outputText value="#{item.cod}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.nume']}" filterBy="#{item.nume}" filterMatchMode="contains" filterValue="#{ocateglist.filterValues[1]}"
+                              filterMaxLength="30">
+                        <h:outputText value="#{item.nume}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.cont']}" filterBy="#{item.cont}" filterMatchMode="contains" filterValue="#{ocateglist.filterValues[2]}"
+                              filterMaxLength="10">
+                        <h:outputText value="#{item.cont}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.user']}">
+                        <h:outputText value="#{item.mod_de}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.time']}">
+                        <h:outputText value="#{item.mod_timp}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+
+                <p:contextMenu for="tabela" selectionMode="single">
+                    <p:menuitem id="cntx-refresh" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh" url="javascript:void(0)" onclick="jQuery('#list\\:menu-refresh').click();"/>
+                </p:contextMenu>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+            </h:form>
+
+            <h:form id="funct">
+                <p:remoteCommand id="init" name='init' action="#{ocateglist.datainit()}" update='list:tabela'
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="PF('tabela').filter();"/>
+            </h:form>
+
+            <script type="text/javascript">
+            /* <![CDATA[ */
+            function downloadStart(){
+                    PF('block').show();
+                }
+                
+                function downloadEnd(){
+                    PF('block').hide();
+                }
+                
+                function tableEndUpdate(){
+                    PF('block').hide();                    
+                    jQuery('#list\\:tabela table').stickyTableHeaders();
+                }
+
+                jQuery(document).ready(function() {
+                    init();
+                });
+            /* ]]> */
+            </script>     
+        </c:if>
+    </ui:define>
+</ui:composition>

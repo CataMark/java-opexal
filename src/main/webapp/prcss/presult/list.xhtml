@@ -1,0 +1,635 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    
+    <ui:define name='metadata'/>
+    <ui:define name="browser-title">#{uimess['presult.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['presult.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+    
+    <ui:define name="content">
+        <style>
+            .ui-breadcrumb .ui-icon-home{
+                background-image: url(#{resource['images/home1_32px.png']});
+                background-position: 0;
+                background-size: 1.2em;
+            }
+        </style>
+        <h:form id="breadcrumb">
+            <p:breadCrumb>
+                <p:menuitem title="#{uimess['mess.selectie']}" value="#{uimess['mess.selectie']}" action="#{presult.navigate('index')}"
+                            ajax="false" style="text-decoration: none;"/>
+                <p:menuitem value="#{uimess['mess.lista']}" url="javascript:void(0)" style="font-weight: bold; color: black;"/>
+            </p:breadCrumb>
+        </h:form>
+        
+        <c:if test="#{not empty presult.initError}">
+            <p:staticMessage severity="warn" detail="#{presult.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty presult.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    font-size: inherit;
+                }
+                
+                #list\:tabela thead th{
+                    vertical-align: bottom;
+                }
+                
+                #list\:tabela tbody td{
+                    white-space: nowrap;
+                }
+                
+                #list\:tabela .ui-datatable-footer{
+                    display: none;
+                }
+                
+                #list\:tabela .acuratete-H{
+                    background-color: green;
+                    color: white;
+                }
+                
+                #list\:tabela .acuratete-M{
+                    background-color: orange;
+                    color: white;
+                }
+                
+                #list\:tabela .acuratete-L{
+                    background-color: red;
+                    color: white;
+                }
+            </style>
+
+            <h:form id="selection">
+                <p:panelGrid id="panel">
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                            <p:outputLabel value="#{uimess['col.perioada']}: " />
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{presult.perioada.an}#{presult.perioada.luna lt 10 ? '.0' : '.'}#{presult.perioada.luna}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{uimess['col.closed']}: "/><span class="#{presult.perioada.inchis ? 'fa fa-check' : 'fa fa-close'}"></span>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                           <p:outputLabel value="#{uimess['col.coarea']}: " />
+                        </p:column>
+                        <p:column colspan="2">
+                            <h:outputText value="#{presult.coarea.cod} #{presult.coarea.nume}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                            <p:outputLabel value="#{uimess['col.ledger']}" />
+                        </p:column>
+                        <p:column colspan="2">
+                            <h:outputText value="#{presult.ledger.ledger} - #{presult.ledger.standard}" />
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+
+            <h:form id='list'>
+                <p:menubar style="margin-bottom: 2px;">
+                    <p:menuitem id="menu-layout" value="#{uimess['col.cols']}" icon="fa fa-columns"/>
+                    
+                    <p:submenu label="#{uimess['upload.btn.load']}" icon="fa fa-upload" rendered="#{not presult.perioada.inchis}">
+                        <p:menuitem id="menu-load-templ" title="#{uimess['upload.menu.load.templ.title']}" value="#{uimess['upload.menu.load.templ.value']}" icon="fa fa-table"
+                                    update="fdlg:dialog" onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();"
+                                    process="@this">
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/presult_upload_template.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['upload.menu.load.templ.dialog']}" target="#{dialog.title}"/>
+                        </p:menuitem>
+                        <p:menuitem id="menu-load-text" title="#{uimess['upload.menu.load.text.title']}" value="#{uimess['upload.menu.load.text.value']}" icon="fa fa-paste"
+                                    action="#{presult.initDbLoad('PF(\'dialog\').hide(); init();')}" update="fdlg:dialog"
+                                    onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">                            
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/upload_text.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['upload.menu.load.text.dialog']}" target="#{dialog.title}"/>
+                            <p:resetInput target="fdlg:dialog"/>
+                        </p:menuitem>
+                        <p:menuitem id="menu-load-file" title="#{uimess['upload.menu.load.file.title']}" value="#{uimess['upload.menu.load.file.value']}" icon="fa fa-file"
+                                    action="#{presult.initDbLoad('PF(\'dialog\').hide(); init();')}" update="fdlg:dialog"
+                                    onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">                            
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/upload_file.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['upload.menu.load.file.dialog']}" target="#{dialog.title}"/>
+                            <p:resetInput target="fdlg:dialog"/>
+                        </p:menuitem>
+                        <p:menuitem id="menu-load-excel" title="#{uimess['upload.menu.load.excel.title']}" value="#{uimess['upload.menu.load.excel.value']}" icon="fa fa-file-excel-o"
+                                    action="#{presult.initDbLoad('PF(\'dialog\').hide(); init();')}" update="fdlg:dialog"
+                                    onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">                            
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/upload_excel.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['upload.menu.load.excel.dialog']}" target="#{dialog.title}"/>
+                            <p:resetInput target="fdlg:dialog"/>
+                        </p:menuitem>
+                    </p:submenu>
+                    
+                    <p:menuitem id="menu-show" title="#{uimess['lazy.menu.view.title']}" value="#{uimess['lazy.menu.view.value']}" icon="fa fa-eye"
+                                update="fdlg:dialog" onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/presult_view_record.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['lazy.menu.view.dialog']}" target="#{dialog.title}"/>
+                    </p:menuitem>
+                    
+                    <p:menuitem id="menu-change" title="#{uimess['lazy.menu.chg']}" value="#{uimess['mess.chg']}" icon="fa fa-pencil"
+                                action="#{presult.newUpdateValues()}" update="fdlg:dialog"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();"
+                                rendered="#{not presult.perioada.inchis}">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/presult_update.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['lazy.menu.chg']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); PF('tabela').filter();" target="#{presult.finishScript}"/>
+                    </p:menuitem>
+                    
+                    <p:menuitem id="menu-delete" title="#{uimess['mess.del']}" value="#{uimess['mess.del']}" icon="fa fa-trash"
+                                update="fdlg:dialog" onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();"
+                                rendered="#{not presult.perioada.inchis}">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/presult_delete.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['mess.del']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); PF('tabela').filter();" target="#{presult.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+                    
+                    <p:menuitem id="menu-download" title="#{uimess['mess.xlsx.dwn.title']}" value="XLSX" icon="fa fa-download" ajax="false"
+                                action="#{presult.export()}" onclick="PrimeFaces.monitorDownload(downloadStart, downloadEnd);"/>
+                    <p:menuitem id="menu-reset" title="#{uimess['mess.reset.title']}" value="#{uimess['mess.reset']}" icon="fa fa-filter"
+                                    url="javascript:void(0)" onclick="PF('tabela').clearFilters();"/>
+                    <p:menuitem id="menu-refresh" title="#{uimess['mess.rfrsh.title']}" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh"
+                                oncomplete="init();"/>
+                    
+                    <p:menuitem id="menu-info" title="#{uimess['lazy.menu.info.title']}" value="#{uimess['lazy.menu.info.value']}" icon="fa fa-info"
+                                update="fdlg:dialog" onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();"
+                                process="@this">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/lazy_records_info_#{portal_lang.language}.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['lazy.menu.info.dialog']}" target="#{dialog.title}"/>
+                    </p:menuitem>
+                </p:menubar>
+
+                <p:dataTable id='tabela' widgetVar="tabela" value='#{presult.list}' var='item'
+                             selection="#{presult.selected}" lazy="true" sortMode="multiple" filterEvent="enter"
+                             paginator="true" rows="20" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                             rowsPerPageTemplate="20,50,100">
+                    <f:facet name="footer">
+                        <p:columnToggler datasource="tabela" trigger="list:menu-layout"/>
+                    </f:facet>
+                    
+                    <p:ajax event='filter' onstart="PF('block').show();" oncomplete="refreshfooter(); PF('block').hide();" ignoreAutoUpdate="true"/>
+                    
+                    <p:column selectionMode="multiple" exportable="false" toggleable="false"/>
+                    
+                    <p:column headerText="#{uimess['col.id']}" priority="4" visible="false">
+                        <h:outputText value="#{fn:substring(item.get('id'), 0, 8)}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.standard']}" visible="true"
+                              sortBy="#{item.get('stndrd')}" filterStyle="min-width: 5em;" filterBy="#{item.get('stndrd')}" field="q2.stndrd" filterMaxLength="4">
+                        <h:outputText value="#{item.get('stndrd')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.kokrs']}" visible="false">
+                        <h:outputText value="#{item.get('kokrs')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.bukrs']}"
+                              sortBy="#{item.get('bukrs')}" filterStyle="min-width: 5em;" filterBy="#{item.get('bukrs')}" field="q1.bukrs" filterMaxLength="4">
+                        <h:outputText value="#{item.get('bukrs')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.gjahr']}" visible="false">
+                        <h:outputText value="#{item.get('gjahr')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.perio']}" visible="false">
+                        <h:outputText value="#{item.get('perio')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.prctr']}" visible="false"
+                              sortBy="#{item.get('prctr')}" filterBy="#{item.get('prctr')}"
+                              field="isnull(p1.profit_center,isnull(r1.profit_center,isnull(s1.profit_center,t1.profit_center)))" filterMaxLength="10">
+                        <h:outputText value="#{item.get('prctr')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.segm']}"
+                              sortBy="#{item.get('segment')}" filterBy="#{item.get('segment')}"
+                              field="isnull(p2.segment,isnull(r2.segment,isnull(s2.segment,t2.segment)))" filterMaxLength="30">
+                        <h:outputText value="#{item.get('segment')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.kostl']}"
+                              sortBy="#{item.get('kostl')}" filterBy="#{item.get('kostl')}"
+                              field="isnull(q1.kostl,isnull(r5.cost_center,isnull(r1.cost_center_resp,isnull(s1.cost_center_resp,t1.cost_center_resp))))" filterMaxLength="10">
+                        <h:outputText value="#{item.get('kostl')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="_#{uimess['col.nume']}"
+                              sortBy="#{item.get('kostl_nume')}" filterBy="#{item.get('kostl_nume')}"
+                              field="isnull(p1.nume,isnull(r6.nume,isnull(r3.nume,isnull(s3.nume,t3.nume))))" filterMaxLength="30">
+                        <h:outputText value="#{item.get('kostl_nume')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.aufnr']}"
+                              sortBy="#{item.get('aufnr')}" filterBy="#{item.get('aufnr')}" field="isnull(r1.cod, s1.cod)" filterMaxLength="10">
+                        <h:outputText value="#{item.get('aufnr')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="_#{uimess['col.nume']}"
+                              sortBy="#{item.get('aufnr_nume')}" filterBy="#{item.get('aufnr_nume')}" field="isnull(r1.nume, s1.nume)" filterMaxLength="30">
+                        <h:outputText value="#{item.get('aufnr_nume')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.posid']}"
+                              sortBy="#{item.get('posid')}" filterBy="#{item.get('posid')}" field="q1.posid" filterMaxLength="30">
+                        <h:outputText value="#{item.get('posid')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="_#{uimess['col.nume']}"
+                              sortBy="#{item.get('posid_nume')}" filterBy="#{item.get('posid_nume')}" field="t1.nume" filterMaxLength="30">
+                        <h:outputText value="#{item.get('posid_nume')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.vbund']}"
+                              sortBy="#{item.get('vbund')}" filterBy="#{item.get('vbund')}" field="q1.vbund" filterMaxLength="5">
+                        <h:outputText value="#{item.get('vbund')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.vbund_nume']}"
+                              sortBy="#{item.get('vbund_nume')}" filterBy="#{item.get('vbund_nume')}" field="u1.nume" filterMaxLength="30">
+                        <h:outputText value="#{item.get('vbund_nume')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.pobart']}" visible="false"
+                              sortBy="#{item.get('pobart')}" filterStyle="min-width: 5em;" filterBy="#{item.get('pobart')}" field="q1.pobart" filterMaxLength="3">
+                        <h:outputText value="#{item.get('pobart')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.pobid']}" visible="false"
+                              sortBy="#{item.get('pobid')}" filterBy="#{item.get('pobid')}" field="q1.pobid" filterMaxLength="30">
+                        <h:outputText value="#{item.get('pobid')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.pob_txt']}" visible="false"
+                              sortBy="#{item.get('pob_txt')}" filterBy="#{item.get('pob_txt')}" field="q1.pob_txt" filterMaxLength="30">
+                        <h:outputText value="#{item.get('pob_txt')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.objnr_n1']}" visible="false"
+                              sortBy="#{item.get('objnr_n1')}" filterBy="#{item.get('objnr_n1')}" field="q1.objnr_n1" filterMaxLength="30">
+                        <h:outputText value="#{item.get('objnr_n1')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.vrgng']}" visible="false"
+                              sortBy="#{item.get('vrgng')}" filterBy="#{item.get('vrgng')}" field="q1.vrgng" filterMaxLength="4">
+                        <h:outputText value="#{item.get('vrgng')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.vrgng_nume']}" visible="false"
+                              sortBy="#{item.get('vrgng_nume')}" filterBy="#{item.get('vrgng_nume')}" field="v1.nume" filterMaxLength="30">
+                        <h:outputText value="#{item.get('vrgng_nume')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.u_tcode']}" visible="false"
+                              sortBy="#{item.get('u_tcode')}" filterBy="#{item.get('u_tcode')}" field="q1.u_tcode" filterMaxLength="4">
+                        <h:outputText value="#{item.get('u_tcode')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.logsystem']}" visible="false"
+                              sortBy="#{item.get('logsystem')}" filterBy="#{item.get('logsystem')}" field="q1.logsystem" filterMaxLength="10">
+                        <h:outputText value="#{item.get('logsystem')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.blart']}" visible="false"
+                              sortBy="#{item.get('blart')}" filterStyle="min-width: 5em;" filterBy="#{item.get('blart')}" field="q1.blart" filterMaxLength="3">
+                        <h:outputText value="#{item.get('blart')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.blart_nume']}" visible="false"
+                              sortBy="#{item.get('blart_nume')}" filterBy="#{item.get('blart_nume')}" field="v2.nume" filterMaxLength="30">
+                        <h:outputText value="#{item.get('blart_nume')}"/>
+                    </p:column>                  
+                    
+                    <p:column headerText="#{uimess['col.kstar']}"
+                              sortBy="#{item.get('kstar')}" filterBy="#{item.get('kstar')}" field="q1.kstar" filterMaxLength="10">
+                        <h:outputText value="#{item.get('kstar')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.cel_ktxt']}"
+                              sortBy="#{item.get('kstar_nume')}" filterBy="#{item.get('kstar_nume')}" field="x1.nume" filterMaxLength="30">
+                        <h:outputText value="#{item.get('kstar_nume')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.u_lokkt']}"
+                              sortBy="#{item.get('alternativ')}" filterBy="#{item.get('alternativ')}" field="x1.alternativ" filterMaxLength="10">
+                        <h:outputText value="#{item.get('alternativ')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.sgtxt']}"
+                              sortBy="#{item.get('sgtxt')}" filterBy="#{item.get('sgtxt')}" field="q1.sgtxt" filterMaxLength="30">
+                        <h:outputText value="#{item.get('sgtxt')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.bltxt']}"
+                              sortBy="#{item.get('bltxt')}" filterBy="#{item.get('bltxt')}" field="q1.bltxt" filterMaxLength="30">
+                        <h:outputText value="#{item.get('bltxt')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.belnr']}" visible="false"
+                              sortBy="#{item.get('belnr')}" filterBy="#{item.get('belnr')}" field="q1.belnr" filterMaxLength="10">
+                        <h:outputText value="#{item.get('belnr')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.buzei']}" visible="false"
+                              sortBy="#{item.get('buzei')}" filterBy="#{item.get('buzei')}" field="q1.buzei" filterMaxLength="4">
+                        <h:outputText value="#{item.get('buzei')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.zzco_belnr']}" visible="false"
+                              sortBy="#{item.get('zzco_belnr')}" filterBy="#{item.get('zzco_belnr')}" field="q1.zzco_belnr" filterMaxLength="10">
+                        <h:outputText value="#{item.get('zzco_belnr')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.refbz_fi']}" visible="false"
+                              sortBy="#{item.get('refbz_fi')}" filterBy="#{item.get('refbz_fi')}" field="q1.refbz_fi" filterMaxLength="4">
+                        <h:outputText value="#{item.get('refbz_fi')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.werks']}" visible="false"
+                              sortBy="#{item.get('werks')}" filterBy="#{item.get('werks')}" field="q1.werks" filterMaxLength="4">
+                        <h:outputText value="#{item.get('werks')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.ebeln']}" visible="false"
+                              sortBy="#{item.get('ebeln')}" filterBy="#{item.get('ebeln')}" field="q1.ebeln" filterMaxLength="10">
+                        <h:outputText value="#{item.get('ebeln')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.ebelp']}" visible="false"
+                              sortBy="#{item.get('ebelp')}" filterBy="#{item.get('ebelp')}" field="q1.ebelp" filterMaxLength="4">
+                        <h:outputText value="#{item.get('ebelp')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.ebtxt']}" visible="false"
+                              sortBy="#{item.get('ebtxt')}" filterBy="#{item.get('ebtxt')}" field="q1.ebtxt" filterMaxLength="30">
+                        <h:outputText value="#{item.get('ebtxt')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.matnr']}" visible="false"
+                              sortBy="#{item.get('matnr')}" filterBy="#{item.get('matnr')}" field="q1.matnr" filterMaxLength="10">
+                        <h:outputText value="#{item.get('matnr')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.mat_txt']}" visible="false"
+                              sortBy="#{item.get('matnr_nume')}" filterBy="#{item.get('matnr_nume')}" field="y1.nume" filterMaxLength="30">
+                        <h:outputText value="#{item.get('matnr_nume')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.gbeextwg_ebx']}" visible="false"
+                              sortBy="#{item.get('gbeextwg_ebx')}" filterBy="#{item.get('gbeextwg_ebx')}" field="q1.gbeextwg_ebx" filterMaxLength="20">
+                        <h:outputText value="#{item.get('gbeextwg_ebx')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.refbt']}" visible="false"
+                              sortBy="#{item.get('refbt')}" filterStyle="min-width: 5em;" filterBy="#{item.get('refbt')}" field="q1.refbt" filterMaxLength="3">
+                        <h:outputText value="#{item.get('refbt')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.refgj']}" visible="false"
+                              sortBy="#{item.get('refgj')}" filterStyle="min-width: 5em;" filterBy="#{item.get('refgj')}" field="q1.refbt" filterMaxLength="4">
+                        <h:outputText value="#{item.get('refgj')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.refbn']}" visible="false"
+                              sortBy="#{item.get('refbn')}" filterBy="#{item.get('refbn')}" field="q1.refbn" filterMaxLength="10">
+                        <h:outputText value="#{item.get('refbn')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.stokz']}" visible="false"
+                              sortBy="#{item.get('stokz')}" filterStyle="min-width: 5em;" filterBy="#{item.get('stokz')}" field="q1.stokz" filterMaxLength="3">
+                        <h:outputText value="#{item.get('stokz')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.awref_rev']}" visible="false"
+                              sortBy="#{item.get('awref_rev')}" filterBy="#{item.get('awref_rev')}" field="q1.awref_rev" filterMaxLength="10">
+                        <h:outputText value="#{item.get('awref_rev')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.gkoar']}" visible="false"
+                              sortBy="#{item.get('gkoar')}" filterStyle="min-width: 5em;" filterBy="#{item.get('gkoar')}" field="q1.gkoar" filterMaxLength="3">
+                        <h:outputText value="#{item.get('gkoar')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.gkont']}" visible="false"
+                              sortBy="#{item.get('gkont')}" filterBy="#{item.get('gkont')}" field="q1.gkont" filterMaxLength="10">
+                        <h:outputText value="#{item.get('gkont')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.gkont_ltxt']}" visible="false"
+                              sortBy="#{item.get('gkont_ltxt')}" filterBy="#{item.get('gkont_ltxt')}" field="q1.gkont_ltxt" filterMaxLength="30">
+                        <h:outputText value="#{item.get('gkont_ltxt')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.u_lifnr']}" visible="false"
+                              sortBy="#{item.get('u_lifnr')}" filterBy="#{item.get('u_lifnr')}" field="q1.u_lifnr" filterMaxLength="10">
+                        <h:outputText value="#{item.get('u_lifnr')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.u_lifnr_nume']}" visible="false"
+                              sortBy="#{item.get('u_lifnr_nume')}" filterBy="#{item.get('u_lifnr_nume')}" field="z1.nume" filterMaxLength="30">
+                        <h:outputText value="#{item.get('u_lifnr_nume')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.wrgbtr']}" style="text-align:right;">
+                        <h:outputText value="#{item.get('wrgbtr')}">
+                            <f:convertNumber pattern="###,##0.00"/>
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.kwaer']}" visible="false">
+                        <h:outputText value="#{item.get('kwaer')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.wtgbtr']}" visible="false" style="text-align:right;">
+                        <h:outputText value="#{item.get('wtgbtr')}">
+                            <f:convertNumber pattern="###,##0.00"/>
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.twaer']}" visible="false"
+                              sortBy="#{item.get('twaer')}" filterBy="#{item.get('twaer')}" field="q1.twaer" filterMaxLength="3">
+                        <h:outputText value="#{item.get('twaer')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.mbgbtr']}" visible="false" style="text-align:right;">
+                        <h:outputText value="#{item.get('mbgbtr')}">
+                            <f:convertNumber pattern="###,##0.00"/>
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.meinb']}" visible="false"
+                              sortBy="#{item.get('meinb')}" filterBy="#{item.get('meinb')}" field="q1.meinb" filterMaxLength="5">
+                        <h:outputText value="#{item.get('meinb')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.usnam']}" visible="false"
+                              sortBy="#{item.get('usnam')}" filterBy="#{item.get('usnam')}" field="q1.usnam" filterMaxLength="20">
+                        <h:outputText value="#{item.get('usnam')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.wsdat']}" visible="false"
+                              sortBy="#{item.get('wsdat')}" filterBy="#{item.get('wsdat')}" field="q1.wsdat" filterMaxLength="20">
+                        <h:outputText value="#{item.get('wsdat')}">
+                            <f:convertDateTime type="date" dateStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.budat']}" visible="false"
+                              sortBy="#{item.get('budat')}" filterBy="#{item.get('budat')}" field="q.budat" filterMaxLength="20">
+                        <h:outputText value="#{item.get('budat')}">
+                            <f:convertDateTime type="date" dateStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.bldat']}" visible="false"
+                              sortBy="#{item.get('bldat')}" filterBy="#{item.get('bldat')}" field="q1.bldat" filterMaxLength="20">
+                        <h:outputText value="#{item.get('bldat')}">
+                            <f:convertDateTime type="date" dateStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.cpudt']}" visible="false"
+                              sortBy="#{item.get('cpudt')}" filterBy="#{item.get('cpudt')}" field="q1.cpudt" filterMaxLength="20">
+                        <h:outputText value="#{item.get('cpudt')}">
+                            <f:convertDateTime type="date" dateStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.cdriver']}" visible="true"
+                              sortBy="#{item.get('cost_driver')}" filterBy="#{item.get('cost_driver')}" field="z2.cost_driver" filterMaxLength="5">
+                        <h:outputText value="#{item.get('cost_driver')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.categ']}" visible="true"
+                              sortBy="#{item.get('ocateg')}" filterBy="#{item.get('ocateg')}" field="q1.ocateg" filterMaxLength="5">
+                        <h:outputText value="#{item.get('ocateg')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="_#{uimess['col.nume']}" visible="true"
+                              sortBy="#{item.get('ocateg_nume')}" filterBy="#{item.get('ocateg_nume')}" field="z2.nume" filterMaxLength="30">
+                        <h:outputText value="#{item.get('ocateg_nume')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.acuratete']}" visible="true" class="acuratete-#{item.get('acuratete_flag')}"
+                              sortBy="#{item.get('acuratete_flag')}" filterBy="#{item.get('acuratete_flag')}"
+                              field="(case when q1.acuratete > 0.8 then 'H' when q1.acuratete > 0.6 then 'M' else 'L' end)" filterMaxLength="1">
+                        <h:outputText value="#{item.get('acuratete_flag')}"/>
+                    </p:column>
+                    
+                    <p:column headerText="_%" sortBy="#{item.get('acuratete')}" field="q1.acuratete" style="text-align: right;">
+                        <h:outputText value="#{item.get('acuratete')}">
+                            <f:convertNumber type="percent" maxFractionDigits="0"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.user']}">
+                        <h:outputText value="#{item.mod_de}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.time']}">
+                        <h:outputText value="#{item.mod_timp}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+                
+                <p:panel id="panel-footer">
+                    <h:outputText value="#{uimess['col.pozitii']}: " style="font-weight: bold;"/>
+                    <h:outputText value="#{presult.list.rowCount}" id="count">
+                        <f:convertNumber pattern="###,##0"/>
+                    </h:outputText>
+
+                    <p:spacer width="10"/>
+
+                    <h:outputText value="#{uimess['col.suma']}: " style="font-weight: bold;"/>
+                    <h:outputText value="#{presult.list.suma}" id="suma">
+                        <f:convertNumber pattern="###,##0.00"/>
+                    </h:outputText>
+                </p:panel>
+
+                <p:contextMenu for="tabela" selectionMode="single">
+                    <p:menuitem id="cntx-show" value="#{uimess['mess.show']}" icon='fa fa-eye' url="javascript:void(0)" onclick="jQuery('#list\\:menu-show').click();"/>
+                    <p:menuitem id="cntx-change" value="#{uimess['mess.chg']}" icon='fa fa-pencil' url="javascript:void(0)" onclick="jQuery('#list\\:menu-change').click();"/>                    
+                    <p:menuitem id="cntx-delete" value="#{uimess['mess.del']}" icon="fa fa-trash" url="javascript:void(0)" onclick="jQuery('#list\\:menu-delete').click();"/>
+                    <p:menuitem id="cntx-reset" value="#{uimess['mess.reset']}" icon="fa fa-filter" url="javascript:void(0)" onclick="jQuery('#list\\:menu-reset').click();"/>
+                    <p:menuitem id="cntx-refresh" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh" url="javascript:void(0)" onclick="jQuery('#list\\:menu-refresh').click();"/>
+                </p:contextMenu>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+                
+                <p:remoteCommand id="init" name='init' action="#{presult.datainit()}" async="true" update='tabela,panel-footer'
+                             onstart="PF('block').show();" oncomplete="tableEndUpdate();" ignoreAutoUpdate="true"/>
+                <p:remoteCommand id="refreshfooter" name="refreshfooter" update="panel-footer" ignoreAutoUpdate="true"/>
+            </h:form>
+
+            <h:form id="fdlg">
+                <p:dialog id="dialog" widgetVar="dialog" header="#{dialog.title}" modal="true" dynamic="true" fitViewport="true" blockScroll="true"
+                          closanyEscape="true" onHide="jQuery('div.ui-menu a').removeClass('ui-state-disabled'); clear();">
+                    <ui:include src="#{dialog.address}"/>
+                </p:dialog>
+            </h:form>
+
+            <h:form id="funct">
+                <p:remoteCommand id="clear" name='clear' action="#{presult.clear()}" update='fdlg:dialog'
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"/>
+            </h:form>
+
+            <script type="text/javascript">
+            /* <![CDATA[ */
+                function downloadStart(){
+                    PF('block').show();
+                }
+                
+                function downloadEnd(){
+                    PF('block').hide();
+                }
+                
+                function tableEndUpdate(){
+                    PF('block').hide();                    
+                    jQuery('#list\\:tabela table').stickyTableHeaders();
+                }
+
+                jQuery(document).ready(function() {
+                    init();
+                    PF('growl').renderMessage({"summary":"#{uimess['growl.tblmenu.basic.title']}",
+                                                "detail":"#{uimess['growl.tblmenu.basic.dtl']}",
+                                                "severity":"info"});
+                });
+            /* ]]> */
+            </script>     
+        </c:if>
+    </ui:define>
+</ui:composition>

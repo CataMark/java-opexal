@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    
+    <ui:define name='metadata'/>
+    <ui:define name="browser-title">#{uimess['classify.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['classify.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+    
+    <ui:define name="content">
+        <style>
+            .ui-breadcrumb .ui-icon-home{
+                background-image: url(#{resource['images/home1_32px.png']});
+                background-position: 0;
+                background-size: 1.2em;
+            }
+        </style>
+        <h:form id="breadcrumb">
+            <p:breadCrumb>
+                <p:menuitem title="#{uimess['mess.selectie']}" value="#{uimess['mess.selectie']}" action="#{classify.navigate('index')}"
+                            ajax="false" style="text-decoration: none;"/>
+                <p:menuitem value="#{uimess['mess.lista']}" url="javascript:void(0)" style="font-weight: bold; color: black;"/>
+            </p:breadCrumb>
+        </h:form>
+        
+        <c:if test="#{not empty classify.initError}">
+            <p:staticMessage severity="warn" detail="#{classify.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty classify.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+                
+                #list\:tabela thead th{
+                    vertical-align: bottom;
+                }
+                
+                #list\:tabela tbody td{
+                    white-space: nowrap;
+                }
+                
+                #list\:tabela .ui-datatable-footer{
+                    display: none;
+                }
+            </style>
+
+            <h:form id="selection">
+                <p:panelGrid id="panel">
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                            <p:outputLabel value="#{uimess['col.perioada']}: " />
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{classify.perioada.an}#{classify.perioada.luna lt 10 ? '.0' : '.'}#{classify.perioada.luna}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{uimess['col.closed']}: "/><span class="#{classify.perioada.inchis ? 'fa fa-check' : 'fa fa-close'}"></span>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                           <p:outputLabel value="#{uimess['col.coarea']}: " />
+                        </p:column>
+                        <p:column colspan="2">
+                            <h:outputText value="#{classify.coarea.cod} #{classify.coarea.nume}"/>
+                        </p:column>
+                    </p:row>                    
+                </p:panelGrid>
+            </h:form>
+
+            <h:form id='list'>
+                <p:menubar style="margin-bottom: 2px;">
+                    <p:menuitem id="menu-process" title="#{uimess['col.process']}" value="#{uimess['col.process']}" icon='fa fa-cog'
+                                update='fdlg:dialog' process="@this" partialSubmit="true" disabled="#{cosetrule.perioada.inchis}"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/classify_process.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['col.process']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide();" target="#{classify.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+                </p:menubar>
+            </h:form>
+
+            <h:form id="fdlg">
+                <p:dialog id="dialog" widgetVar="dialog" header="#{dialog.title}" modal="true" dynamic="true" fitViewport="true" blockScroll="true"
+                          position="center top" closanyEscape="true" onHide="jQuery('div.ui-menu a').removeClass('ui-state-disabled'); clear();">
+                    <ui:include src="#{dialog.address}"/>
+                </p:dialog>
+            </h:form>
+
+            <h:form id="funct">
+                <p:remoteCommand id="clear" name='clear' action="#{classify.clear()}" update='fdlg:dialog'
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"/>
+            </h:form>
+
+            <script type="text/javascript">
+            /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+            /* ]]> */
+            </script>     
+        </c:if>
+    </ui:define>
+</ui:composition>

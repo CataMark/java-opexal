@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    
+    <ui:define name='metadata'/>
+    <ui:define name="browser-title">#{uimess['process.byflag.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['process.byflag.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+    
+    <ui:define name="content">
+        <style>
+            .ui-breadcrumb .ui-icon-home{
+                background-image: url(#{resource['images/home1_32px.png']});
+                background-position: 0;
+                background-size: 1.2em;
+            }
+        </style>
+        <h:form id="breadcrumb">
+            <p:breadCrumb>
+                <p:menuitem title="#{uimess['mess.selectie']}" value="#{uimess['mess.selectie']}" action="#{prssflag.navigate('index')}"
+                            ajax="false" style="text-decoration: none;"/>
+                <p:menuitem value="#{uimess['mess.lista']}" url="javascript:void(0)" style="font-weight: bold; color: black;"/>
+            </p:breadCrumb>
+        </h:form>
+        
+        <c:if test="#{not empty prssflag.initError}">
+            <p:staticMessage severity="warn" detail="#{prssflag.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty prssflag.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+                
+                #list\:tabela thead th{
+                    vertical-align: bottom;
+                }
+                
+                #list\:tabela tbody td{
+                    white-space: nowrap;
+                }
+                
+                #list\:tabela .ui-datatable-footer{
+                    display: none;
+                }
+            </style>
+
+            <h:form id="selection">
+                <p:panelGrid id="panel">                                        
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                           <p:outputLabel value="#{uimess['col.coarea']}: " />
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{prssflag.coarea.cod} #{prssflag.coarea.nume}"/>
+                        </p:column>
+                    </p:row>                    
+                </p:panelGrid>
+            </h:form>
+
+            <h:form id='list'>
+                <p:menubar style="margin-bottom: 2px;">
+                    <p:menuitem id="menu-process" title="#{uimess['col.process']}" value="#{uimess['col.process']}" icon='fa fa-cog'
+                                update='fdlg:dialog'
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/prssflag_process.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['col.process']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{prssflag.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+                    
+                    <p:menuitem id="menu-delete" title="#{uimess['process.byflag.del']}" value="#{uimess['mess.del']}" icon='fa fa-trash'
+                                update='fdlg:dialog'
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/prssflag_delete.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['process.byflag.del']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{prssflag.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+
+                    <p:menuitem id="menu-refresh" title="#{uimess['mess.rfrsh.title']}" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh"
+                                oncomplete="init();"/>
+                </p:menubar>
+
+                <p:dataTable id='tabela' widgetVar="tabela" value='#{prssflag.list}' var='item' sortBy="#{item.mod_de} #{item.mod_timp}" rowKey="#{item.id}"
+                             selection="#{prssflag.selected}">
+                    
+                    <p:column selectionMode="multiple" exportable="false"/>
+                    
+                    <p:column headerText="ID">
+                        <h:outputText value="#{item.guid}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.tranz']}">
+                        <h:outputText value="#{item.tranz}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.user']}">
+                        <h:outputText value="#{item.mod_de}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.time']}">
+                        <h:outputText value="#{item.mod_timp}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+
+                <p:contextMenu for="tabela" selectionMode="multiple">                    
+                    <p:menuitem id="cntx-delete" value="#{uimess['mess.del']}" icon="fa fa-trash" url="javascript:void(0)" onclick="jQuery('#list\\:menu-delete').click();"/>
+                    <p:menuitem id="cntx-refresh" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh" url="javascript:void(0)" onclick="jQuery('#list\\:menu-refresh').click();"/>
+                </p:contextMenu>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+            </h:form>
+
+            <h:form id="fdlg">
+                <p:dialog id="dialog" widgetVar="dialog" header="#{dialog.title}" modal="true" dynamic="true" fitViewport="true" blockScroll="true"
+                          closanyEscape="true" onHide="jQuery('div.ui-menu a').removeClass('ui-state-disabled'); clear();">
+                    <ui:include src="#{dialog.address}"/>
+                </p:dialog>
+            </h:form>
+
+            <h:form id="funct">
+                <p:remoteCommand id="init" name="init" action="#{prssflag.datainit()}" update="list:tabela"
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="tableEndUpdate();"/>
+                <p:remoteCommand id="update" name="update" update="list:tabela"
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="tableEndUpdate();"/>
+                <p:remoteCommand id="clear" name='clear' action="#{prssflag.clear()}" update='fdlg:dialog'
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"/>
+            </h:form>
+
+            <script type="text/javascript">
+            /* <![CDATA[ */                
+                function tableEndUpdate(){
+                    PF('block').hide();                    
+                    jQuery('#list\\:tabela table').stickyTableHeaders();
+                }
+
+                jQuery(document).ready(function() {
+                    init();
+                    PF('growl').renderMessage({"summary":"#{uimess['growl.tblmenu.basic.title']}",
+                                                "detail":"#{uimess['growl.tblmenu.basic.dtl']}",
+                                                "severity":"info"});
+                });
+            /* ]]> */
+            </script>     
+        </c:if>
+    </ui:define>
+</ui:composition>

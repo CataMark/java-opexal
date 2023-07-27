@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['err.lazy.filter.norecs']}" rendered="#{empty fagll03.list.wrappedData}"/>
+    <p:panelGrid id="panel" rendered="#{not empty fagll03.list.wrappedData}">
+        <f:facet name="header">
+            <p:row>
+                <p:column colspan="3" style="text-align: left;">
+                    <p:messages closable="true"/>
+                </p:column>
+            </p:row>
+            <p:row>
+                <p:column>
+                    <h:outputText value="#{uimess['col.camp']}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{uimess['col.valoare']}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{uimess['col.empty']}"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.prctr']}" for="prctr"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="prctr" value="#{fagll03.updateValues.profit_center.value}" size="10" maxlength="10"
+                             validatorMessage="#{uimess['col.prctr']}: #{uimess['valid.10chars']}">
+                    <f:validateLength minimum="10" maximum="10"/>
+                    <f:validateRegex pattern="[0-9_a-zA-Z]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="prctr_empty" value="#{fagll03.updateValues.profit_center.goleste}"
+                                         rendered="#{not fagll03.updateValues.profit_center.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.kostl']}" for="kostl"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="kostl" value="#{fagll03.updateValues.cost_center.value}" size="10" maxlength="10"
+                             validatorMessage="#{uimess['col.kostl']}: #{uimess['valid.10numbers']}">
+                    <f:validateLength minimum="10" maximum="10"/>
+                    <f:validateRegex pattern="[0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="kostl_empty" value="#{fagll03.updateValues.cost_center.goleste}"
+                                         rendered="#{not fagll03.updateValues.cost_center.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.aufnr']}" for="aufnr"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="aufnr" value="#{fagll03.updateValues.order.value}" size="10" maxlength="10"
+                             validatorMessage="#{uimess['col.aufnr']}: 8 - #{uimess['valid.10numbers']}">
+                    <f:validateLength minimum="8" maximum="10"/>
+                    <f:validateRegex pattern="[0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="aufnr_empty" value="#{fagll03.updateValues.order.goleste}"
+                                         rendered="#{not fagll03.updateValues.order.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.projk']}" for="projk"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="projk" value="#{fagll03.updateValues.wbs.value}" size="30" maxlength="35"
+                             validatorMessage="#{uimess['col.projk']}: 11 - 35 characters!">
+                    <f:validateLength minimum="11" maximum="35"/>
+                    <f:validateRegex pattern="[0-9A-Za-z.]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="projk_empty" value="#{fagll03.updateValues.wbs.goleste}"
+                                         rendered="#{not fagll03.updateValues.wbs.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.vbund']}" for="vbund"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="vbund" value="#{fagll03.updateValues.ic_part.value}" size="5" maxlength="5"
+                             validatorMessage="#{uimess['col.vbund']}: #{uimess['valid.1to5digits']}">
+                    <f:validateLength minimum="1" maximum="5"/>
+                    <f:validateRegex pattern="[0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="vbund_empty" value="#{fagll03.updateValues.ic_part.goleste}"
+                                         rendered="#{not fagll03.updateValues.ic_part.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.glvor']}" for="glvor"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="glvor" value="#{fagll03.updateValues.buss_tranz.value}" size="4" maxlength="4"
+                             validatorMessage="#{uimess['col.glvor']}: #{uimess['valid.4capitornumb']}">
+                    <f:validateLength minimum="4" maximum="4"/>
+                    <f:validateRegex pattern="[A-Z0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="glvor_empty" value="#{fagll03.updateValues.buss_tranz.goleste}"
+                                         rendered="#{not fagll03.updateValues.buss_tranz.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.u_tcode']}" for="u_tcode"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="u_tcode" value="#{fagll03.updateValues.sap_tranz.value}" size="1" maxlength="10"
+                             validatorMessage="#{uimess['col.u_tcode']}: #{uimess['valid.1to10capitordigit']}">
+                    <f:validateLength minimum="1" maximum="10"/>
+                    <f:validateRegex pattern="[A-Z0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="u_tcode_empty" value="#{fagll03.updateValues.sap_tranz.goleste}"
+                                         rendered="#{not fagll03.updateValues.sap_tranz.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.blart']}" for="blart"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="blart" value="#{fagll03.updateValues.doc_tip.value}" size="2" maxlength="2"
+                            validatorMessage="#{uimess['col.blart']}: #{uimess['valid.2capitornumb']}">
+                    <f:validateLength minimum="2" maximum="2"/>
+                    <f:validateRegex pattern="[A-Z0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="blart_empty" value="#{fagll03.updateValues.doc_tip.goleste}"
+                                         rendered="#{not fagll03.updateValues.doc_tip.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.konto']}" for="konto"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="konto" value="#{fagll03.updateValues.cont_ccoa.value}" size="10" maxlength="10"
+                             validatorMessage="#{uimess['col.konto']}: #{uimess['valid.10numbers']}">
+                    <f:validateLength minimum="10" maximum="10"/>
+                    <f:validateRegex pattern="[0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="konto_empty" value="#{fagll03.updateValues.cont_ccoa.goleste}"
+                                         rendered="#{not fagll03.updateValues.cont_ccoa.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.sgtxt']}" for="sgtxt"/>
+            </p:column>
+            <p:column>
+                <p:inputTextarea id="sgtxt" value="#{fagll03.updateValues.doc_text.value}" cols="30" rows="3" maxlength="1000"/>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="sgtxt_empty" value="#{fagll03.updateValues.doc_text.goleste}"
+                                         rendered="#{not fagll03.updateValues.doc_text.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.u_bktxt']}" for="u_bktxt"/>
+            </p:column>
+            <p:column>
+                <p:inputTextarea id="u_bktxt" value="#{fagll03.updateValues.head_text.value}" cols="30" rows="3" maxlength="1000"/>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="u_bktxt_empty" value="#{fagll03.updateValues.head_text.goleste}"
+                                         rendered="#{not fagll03.updateValues.head_text.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.u_matnr']}" for="u_matnr"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="u_matnr" value="#{fagll03.updateValues.material.value}" size="10" maxlength="10"
+                             validatorMessage="#{uimess['col.u_matnr']}: #{uimess['valid.10numbers']}">
+                    <f:validateLength minimum="10" maximum="10"/>
+                    <f:validateRegex pattern="[0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="u_matnr_empty" value="#{fagll03.updateValues.material.goleste}"
+                                         rendered="#{not fagll03.updateValues.material.obligatoriu}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.u_lifnr']}" for="u_lifnr"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="u_lifnr" value="#{fagll03.updateValues.vendor.value}" size="7" maxlength="7"
+                             validatorMessage="#{uimess['col.u_lifnr']}: #{uimess['valid.7numbers']}">
+                    <f:validateLength minimum="7" maximum="7"/>
+                    <f:validateRegex pattern="[0-9]+"/>
+                </p:inputText>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="u_lifnr_empty" value="#{fagll03.updateValues.vendor.goleste}"
+                                         rendered="#{not fagll03.updateValues.vendor.obligatoriu}"/>
+            </p:column>
+        </p:row>
+
+        <f:facet name="footer">
+            <p:row>
+                <p:column colspan="3">
+                    <p:commandButton id="update-filter" widgetVar="dialog-update-filter" value="#{uimess['lazy.btn.upd.filter']}" icon="fa fa-save" action="#{fagll03.updateByFilter()}"
+                                     update="panel" onstart="startUpdate();" oncomplete="endUpdate();"/>
+                    <p:commandButton id="update-select" widgetVar="dialog-update-select" value="#{uimess['lazy.btn.upd.select']}" icon="fa fa-save" action="#{fagll03.updateSelected()}"
+                                     rendered="#{not empty fagll03.selected}" update="panel" onstart="startUpdate();" oncomplete="endUpdate();"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+    </p:panelGrid>
+    <script type="text/javascript">        
+        function startUpdate(){
+            jQuery('#fdlg\\:progress').show();
+            PF('dialog-update-filter').disable();
+            if (jQuery("#fdlg\\:update-select").length > 0) { PF('dialog-update-select').disable(); }
+        }
+        
+        function endUpdate(){
+            PF('dialog-update-filter').enable();
+            if (jQuery("#fdlg\\:update-select").length > 0) { PF('dialog-update-select').enable(); }
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        }
+        
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+    </script>
+</ui:composition>

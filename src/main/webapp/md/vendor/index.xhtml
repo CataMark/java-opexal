@@ -1,0 +1,219 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    
+    <ui:define name='metadata'/>
+    <ui:define name="browser-title">#{uimess['vendor.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['vendor.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+    
+    <ui:define name="content">
+        
+        <c:if test="#{not empty vendorlist.initError}">
+            <p:staticMessage severity="warn" detail="#{vendorlist.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty vendorlist.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+                
+                #list\:tabela thead th{
+                    vertical-align: bottom;
+                }
+                
+                #list\:tabela tbody td{
+                    white-space: nowrap;
+                }
+                
+                #list\:tabela .ui-datatable-footer{
+                    display: none;
+                }
+            </style>
+
+            <h:form id='list'>
+                <p:menubar style="margin-bottom: 2px;">
+                    <p:menuitem id="menu-add" title="#{uimess['vendor.btn.add.title']}" value="#{uimess['mess.add']}" icon='fa fa-plus'
+                                action="#{vendorlist.newItem()}" update='fdlg:dialog' process="@this" partialSubmit="true"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/vendor_save.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['vendor.btn.add.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{vendor.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+                    <p:menuitem id="menu-change" title="#{uimess['vendor.btn.chg.title']}" value="#{uimess['mess.chg']}" icon='fa fa-pencil'
+                                action="#{vendorlist.passSelected(true)}" update='fdlg:dialog'
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/vendor_save.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['vendor.btn.chg.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{vendor.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+                    <p:menuitem id="menu-delete" title="#{uimess['vendor.btn.del.title']}" value="#{uimess['mess.del']}" icon='fa fa-trash'
+                                action="#{vendorlist.passSelected(false)}" update='fdlg:dialog'
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/vendor_delete.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['vendor.btn.del.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{vendor.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+                    
+                    <p:submenu label="#{uimess['upload.btn.load']}" icon="fa fa-upload">
+                        <p:menuitem id="menu-load-templ" title="#{uimess['upload.menu.load.templ.title']}" value="#{uimess['upload.menu.load.templ.value']}" icon="fa fa-table"
+                                    update="fdlg:dialog" onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/vendor_upload_template.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['upload.menu.load.templ.dialog']}" target="#{dialog.title}"/>
+                        </p:menuitem>
+                        <p:menuitem id="menu-load-text" title="#{uimess['upload.menu.load.text.title']}" value="#{uimess['upload.menu.load.text.value']}" icon="fa fa-paste"
+                                    action="#{vendorlist.initDbLoad('PF(\'dialog\').hide(); init();')}" update="fdlg:dialog"
+                                    onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">                            
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/upload_text.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['upload.menu.load.text.dialog']}" target="#{dialog.title}"/>
+                            <p:resetInput target="fdlg:dialog"/>
+                        </p:menuitem>
+                        <p:menuitem id="menu-load-file" title="#{uimess['upload.menu.load.file.title']}" value="#{uimess['upload.menu.load.file.value']}" icon="fa fa-file"
+                                    action="#{vendorlist.initDbLoad('PF(\'dialog\').hide(); init();')}" update="fdlg:dialog"
+                                    onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">                            
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/upload_file.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['upload.menu.load.file.dialog']}" target="#{dialog.title}"/>
+                            <p:resetInput target="fdlg:dialog"/>
+                        </p:menuitem>
+                        <p:menuitem id="menu-load-excel" title="#{uimess['upload.menu.load.excel.title']}" value="#{uimess['upload.menu.load.excel.value']}" icon="fa fa-file-excel-o"
+                                    action="#{vendorlist.initDbLoad('PF(\'dialog\').hide(); init();')}" update="fdlg:dialog"
+                                    onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">                            
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/upload_excel.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['upload.menu.load.excel.dialog']}" target="#{dialog.title}"/>
+                            <p:resetInput target="fdlg:dialog"/>
+                        </p:menuitem>
+                    </p:submenu>
+                    
+                    <p:menuitem id="menu-download" title="#{uimess['mess.xlsx.dwn.title']}" value="XLSX" icon="fa fa-download" ajax="false"
+                                action="#{vendorlist.export()}" onclick="PrimeFaces.monitorDownload(downloadStart, downloadEnd);"/>
+                    <p:menuitem id="menu-reset" title="#{uimess['mess.reset.title']}" value="#{uimess['mess.reset']}" icon="fa fa-filter"
+                                    url="javascript:void(0)" onclick="PF('tabela').clearFilters();"/>
+                    <p:menuitem id="menu-refresh" title="#{uimess['mess.rfrsh.title']}" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh"
+                                oncomplete="init();"/>
+                    
+                    <p:menuitem id="menu-info" title="#{uimess['lazy.menu.info.title']}" value="#{uimess['lazy.menu.info.value']}" icon="fa fa-info"
+                                update="fdlg:dialog" onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();"
+                                process="@this">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/lazy_records_info_#{portal_lang.language}.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['lazy.menu.info.dialog']}" target="#{dialog.title}"/>
+                    </p:menuitem>
+                </p:menubar>
+
+                <p:dataTable id='tabela' widgetVar="tabela" value='#{vendorlist.list}' var='item' sortBy="#{item.cod}" rowKey="#{item.cod}"
+                             selection="#{vendorlist.selected}" selectionMode="single" lazy="true" sortMode="multiple" filterEvent="enter"
+                             paginator="true" rows="20" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                             rowsPerPageTemplate="20,50,100">
+                    <p:ajax event='filter' onstart="PF('block').show();" oncomplete="refreshfooter(); PF('block').hide();" ignoreAutoUpdate="true"/>
+
+                    <p:column headerText="#{uimess['col.cod']}" filterBy="#{item.cod}" field="q.cod" filterMaxLength="10" filterStyle="width: 9em;"
+                              sortBy="#{item.cod}">
+                        <h:outputText value="#{item.cod}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.nume']}" filterBy="#{item.nume}" field="q.nume" filterMaxLength="30"
+                              sortBy="#{item.nume}">
+                        <h:outputText value="#{item.nume}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.user']}" field="q.mod_de" sortBy="#{item.mod_de}">
+                        <h:outputText value="#{item.mod_de}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.time']}" field="q.mod_timp" sortBy="#{item.mod_timp}">
+                        <h:outputText value="#{item.mod_timp}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+                
+                <p:panel id="panel-footer">
+                    <h:outputText value="#{uimess['col.pozitii']}: " style="font-weight: bold;"/>
+                    <h:outputText value="#{vendorlist.list.rowCount}" id="count">
+                        <f:convertNumber pattern="###,##0"/>
+                    </h:outputText>
+                </p:panel>
+
+                <p:contextMenu for="tabela" selectionMode="single">
+                    <p:menuitem id="cntx-change" value="#{uimess['mess.chg']}" icon='fa fa-pencil' url="javascript:void(0)" onclick="jQuery('#list\\:menu-change').click();"/>                    
+                    <p:menuitem id="cntx-delete" value="#{uimess['mess.del']}" icon="fa fa-trash" url="javascript:void(0)" onclick="jQuery('#list\\:menu-delete').click();"/>
+                    <p:menuitem id="cntx-refresh" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh" url="javascript:void(0)" onclick="jQuery('#list\\:menu-refresh').click();"/>
+                </p:contextMenu>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+                
+                <p:remoteCommand id="init" name='init' action="#{vendorlist.datainit()}" async="true" update='tabela,panel-footer'
+                             onstart="PF('block').show();" oncomplete="tableEndUpdate();" ignoreAutoUpdate="true"/>
+                <p:remoteCommand id="refreshfooter" name="refreshfooter" update="panel-footer" ignoreAutoUpdate="true"/>
+            </h:form>
+
+            <h:form id="fdlg">
+                <p:dialog id="dialog" widgetVar="dialog" header="#{dialog.title}" modal="true" dynamic="true" fitViewport="true" blockScroll="true"
+                          position="center top" closanyEscape="true" onHide="jQuery('div.ui-menu a').removeClass('ui-state-disabled'); clear();">
+                    <ui:include src="#{dialog.address}"/>
+                </p:dialog>
+            </h:form>
+
+            <h:form id="funct">
+                <p:remoteCommand id="update" name="update" update="list:tabela,list:panel-footer"
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="tableEndUpdate();"/>
+                <p:remoteCommand id="clear" name='clear' action="#{vendorlist.clear()}" update='fdlg:dialog'
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"/>
+            </h:form>
+
+            <script type="text/javascript">
+            /* <![CDATA[ */
+                function downloadStart(){
+                    PF('block').show();
+                }
+                
+                function downloadEnd(){
+                    PF('block').hide();
+                }
+                
+                function tableEndUpdate(){
+                    PF('block').hide();                    
+                    jQuery('#list\\:tabela table').stickyTableHeaders();
+                }
+
+                jQuery(document).ready(function() {
+                    init();
+                    PF('growl').renderMessage({"summary":"#{uimess['growl.tblmenu.basic.title']}",
+                                                "detail":"#{uimess['growl.tblmenu.basic.dtl']}",
+                                                "severity":"info"});
+                });
+            /* ]]> */
+            </script>     
+        </c:if>
+    </ui:define>
+</ui:composition>

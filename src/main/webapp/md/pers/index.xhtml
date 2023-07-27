@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <ui:define name='metadata'/>
+    <ui:define name="browser-title">#{uimess['period.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['period.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+    
+    <ui:define name="content">
+        <c:if test="#{not empty periodprompt.initError}">
+            <p:staticMessage severity="warn" detail="#{periodprompt.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty periodprompt.initError}">
+            <style type="text/css">
+                #prompt{
+                    display: inline-block;
+                }
+
+                #prompt\:panel .ui-widget-content{
+                    border-bottom: none;
+                }
+                #prompt\:panel .ui-widget-content:not(:first-child){
+                    border-top: none;
+                }        
+                #prompt\:panel .ui-panelgrid-cell{
+                    border: none;
+                }
+            </style>
+
+            <h:form id="prompt">            
+                <p:panelGrid id="panel">
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:messages closable="true"/>
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.an']}" for="an" indicateRequired="true"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="an" value="#{periodprompt.selected}" filter="true" filterMatchMode="contains"
+                                             validatorMessage="#{uimess['col.an']}: #{uimess['valid.4numbers']}" editable="true">
+                                <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue="" noSelectionOption="true" />
+                                <f:selectItems value="#{periodprompt.ani}" var="item" itemLabel="#{item}"  itemValue="#{item}"/>
+                                <f:validateLongRange minimum="2000" maximum="9999"/>
+                                <f:validateRequired/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+
+                    <f:facet name="footer">
+                        <p:row>
+                            <p:column colspan="2">
+                                <p:commandButton id="submit" widgetVar="prompt-submit" ajax="false" value="#{uimess['mess.aplica']}" icon="fa fa-chevron-right"
+                                        action="#{periodprompt.navigate('list')}"/>
+                            </p:column>
+                        </p:row>
+                    </f:facet>
+                </p:panelGrid>
+            </h:form>
+
+            <script type="text/javascript">
+            /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+            /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

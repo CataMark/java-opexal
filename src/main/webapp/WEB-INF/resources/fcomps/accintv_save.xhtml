@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['accintv.nosel']}" rendered="#{empty accintv.selected}"/>
+    <p:staticMessage severity="warn" detail="#{accintv.initError}" rendered="#{not empty accintv.initError}"/>
+    <p:panelGrid id='panel' rendered="#{not empty accintv.selected and empty accintv.initError}">
+        <p:row>
+            <p:column colspan="2">
+                <p:messages closable="true"/>
+            </p:column>
+        </p:row>
+        
+        <p:row rendered="#{not empty accintv.selected.mod_timp}">
+            <p:column>
+                <p:outputLabel value="#{uimess['col.id']}" for="id"/>
+            </p:column>
+            <p:column>
+                <h:outputText id="id" value="#{accintv.selected.id}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.start']}" for="start" indicateRequired="true"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="start" value="#{accintv.selected.start}" size="10" maxlength="10"
+                             validatorMessage="#{uimess['col.start']}: #{uimess['valid.10numbers']}">
+                    <f:validateRequired/>
+                    <f:validateLength minimum="10" maximum="10"/>
+                    <f:validateRegex pattern="[0-9]+"/>
+                </p:inputText>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.end']}" for="end" indicateRequired="true"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="end" value="#{accintv.selected.end}" size="10" maxlength="10"
+                             validatorMessage="#{uimess['col.end']}: #{uimess['valid.10numbers']}">
+                    <f:validateRequired/>
+                    <f:validateLength minimum="10" maximum="10"/>
+                    <f:validateRegex pattern="[0-9]+"/>
+                </p:inputText>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.process']}" for="proces"/>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="proces" value="#{accintv.selected.proces}"/>
+            </p:column>
+        </p:row>
+        
+        <f:facet name="footer">
+            <p:row>
+                <p:column colspan="2">
+                    <p:commandButton id='save' widgetVar="dialog-save" value="#{uimess['mess.save']}" icon="fa fa-save"
+                             action="#{accintv.save()}" update="panel"
+                             onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                             oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+    </p:panelGrid>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+    </script>
+</ui:composition>
+

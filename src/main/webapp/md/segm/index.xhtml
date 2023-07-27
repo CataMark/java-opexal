@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['segment.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['segment.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <c:if test="#{not empty segmentlist.initError}">
+            <p:staticMessage severity="warn" detail="#{segmentlist.initError}"/>
+            <script type="text/javascript">
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty segmentlist.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+            </style>
+
+            <h:form id='list'>
+                <p:menubar style="margin-bottom: 2px;">
+                    <p:menuitem id="menu-add" title="#{uimess['segment.btn.add.title']}" value="#{uimess['mess.add']}" icon='fa fa-plus'
+                                action="#{segmentlist.newItem()}" update='fdlg:dialog' process="@this" partialSubmit="true"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/segment_save.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['segment.btn.add.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{segment.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+                    <p:menuitem id="menu-delete" title="#{uimess['segment.btn.del.title']}" value="#{uimess['mess.del']}" icon='fa fa-trash'
+                                action="#{segmentlist.passSelected(false)}" update='fdlg:dialog'
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/segment_delete.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['segment.btn.del.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{segment.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+                    <p:menuitem id="menu-refresh" title="#{uimess['mess.rfrsh.title']}" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh"
+                                oncomplete="init();"/>
+                </p:menubar>
+
+                <p:dataTable id='tabela' widgetVar="tabela" value='#{segmentlist.list}' var='item' sortBy="#{item.cod}"
+                             selectionMode="single" selection="#{segmentlist.selected}" rowKey="#{item.cod}" reflow="true">
+
+                    <p:column headerText="#{uimess['col.cod']}">
+                        <h:outputText value="#{item.cod}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.user']}">
+                        <h:outputText value="#{item.mod_de}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.time']}">
+                        <h:outputText value="#{item.mod_timp}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+
+                <p:contextMenu for="tabela" selectionMode="single">                   
+                    <p:menuitem id="cntx-delete" value="#{uimess['mess.del']}" icon="fa fa-trash" url="javascript:void(0)" onclick="jQuery('#list\\:menu-delete').click();"/>
+                    <p:menuitem id="cntx-refresh" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh" url="javascript:void(0)" onclick="jQuery('#list\\:menu-refresh').click();"/>
+                </p:contextMenu>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+            </h:form>
+
+            <h:form id="fdlg">
+                <p:dialog id="dialog" widgetVar="dialog" header="#{dialog.title}" modal="true" dynamic="true" fitViewport="true" blockScroll="true"
+                          closanyEscape="true" onHide="jQuery('div.ui-menu a').removeClass('ui-state-disabled'); clear();">
+                    <ui:include src="#{dialog.address}"/>
+                </p:dialog>
+            </h:form>
+
+            <h:form id="funct">
+                <p:remoteCommand id="init" name='init' action="#{segmentlist.datainit()}" update='list:tabela'
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="tableEndUpdate();"/>
+
+                <p:remoteCommand id="update" name="update" update="list:tabela"
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="tableEndUpdate();"/>
+
+                <p:remoteCommand id="clear" name='clear' action="#{segmentlist.clear()}" update='fdlg:dialog'
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"/>
+            </h:form>
+
+            <script type="text/javascript">
+            /*<![CDATA[*/
+                function tableEndUpdate(){
+                    PF('block').hide();                    
+                    jQuery('#list\\:tabela table').stickyTableHeaders();
+                }
+
+                jQuery(document).ready(function() {
+                    init();
+                    PF('growl').renderMessage({"summary":"#{uimess['growl.tblmenu.basic.title']}",
+                                                "detail":"#{uimess['growl.tblmenu.basic.dtl']}",
+                                                "severity":"info"});
+                });
+            /*]]>*/
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

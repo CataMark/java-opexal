@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel div.ui-g:not(:last-child){
+            border-bottom: inherit;
+        }
+        
+        #fdlg\:panel div.ui-g:nth-child(even){
+            background-color: #eeeeee;
+        }
+        
+        .show-col1{
+            font-weight: bold;
+        }
+        
+        .show-col1 label:after{
+            content: ":";
+        }
+        
+        .show-col1, .show-col2{
+            white-space: nowrap;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['err.lazy.select.norecs']}" rendered="#{empty ksb1.selected}"/>
+    <p:panelGrid id="panel" columns="2" layout="grid" rendered="#{not empty ksb1.selected}" columnClasses="show-col1,show-col2">
+        <f:facet name="header">
+            <h:outputText value="#{uimess['lazy.menu.view.title']}"/>
+        </f:facet>
+        
+        <p:outputLabel value="#{uimess['col.id']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('id')}"/>
+        
+        <p:outputLabel value="#{uimess['col.kokrs']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('kokrs')}"/>
+        
+        <p:outputLabel value="#{uimess['col.bukrs']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('bukrs')}"/>
+        
+        <p:outputLabel value="#{uimess['col.gjahr']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('gjahr')}"/>
+        
+        <p:outputLabel value="#{uimess['col.perio']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('perio')}"/>
+        
+        <p:outputLabel value="#{uimess['col.prctr']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('profit_center')}"/>
+        
+        <p:outputLabel value="#{uimess['col.segm']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('segment')}"/>
+        
+        <p:outputLabel value="#{uimess['col.obart']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('obart')}"/>
+        
+        <p:outputLabel value="#{uimess['col.kostl']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('kostl')}"/>
+        
+        <p:outputLabel value="#{uimess['col.obj_txt']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('obj_txt')}"/>
+        
+        <p:outputLabel value="#{uimess['col.vbund']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('vbund')}"/>
+        
+        <p:outputLabel value="#{uimess['col.vbund_nume']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('vbund_nume')}"/>
+        
+        <p:outputLabel value="#{uimess['col.pobart']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('pobart')}"/>
+        
+        <p:outputLabel value="#{uimess['col.pobid']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('pobid')}"/>
+        
+        <p:outputLabel value="#{uimess['col.pob_txt']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('pob_txt')}"/>
+        
+        <p:outputLabel value="#{uimess['col.objnr_n1']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('objnr_n1')}"/>
+        
+        <p:outputLabel value="#{uimess['col.vrgng']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('vrgng')}"/>
+        
+        <p:outputLabel value="#{uimess['col.vrgng_nume']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('vrgng_nume')}"/>
+        
+        <p:outputLabel value="#{uimess['col.orgvg']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('orgvg')}"/>
+        
+        <p:outputLabel value="#{uimess['col.orgvg_nume']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('orgvg_nume')}"/>
+        
+        <p:outputLabel value="#{uimess['col.logsystem']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('logsystem')}"/>
+        
+        <p:outputLabel value="#{uimess['col.blart']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('blart')}"/>
+        
+        <p:outputLabel value="#{uimess['col.blart_nume']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('blart_nume')}"/>
+        
+        <p:outputLabel value="#{uimess['col.beknz']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('beknz')}"/>
+        
+        <p:outputLabel value="#{uimess['col.kstar']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('kstar')}"/>
+        
+        <p:outputLabel value="#{uimess['col.cel_ktxt']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('cel_ktxt')}"/>
+        
+        <p:outputLabel value="#{uimess['col.sgtxt']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('sgtxt')}"/>
+        
+        <p:outputLabel value="#{uimess['col.bltxt']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('bltxt')}"/>
+        
+        <p:outputLabel value="#{uimess['col.belnr']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('belnr')}"/>
+        
+        <p:outputLabel value="#{uimess['col.buzei']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('buzei')}"/>
+        
+        <p:outputLabel value="#{uimess['col.zzco_belnr']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('zzco_belnr')}"/>
+        
+        <p:outputLabel value="#{uimess['col.refbz_fi']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('refbz_fi')}"/>
+        
+        <p:outputLabel value="#{uimess['col.werks']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('werks')}"/>
+        
+        <p:outputLabel value="#{uimess['col.ebeln']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('ebeln')}"/>
+        
+        <p:outputLabel value="#{uimess['col.ebelp']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('ebelp')}"/>
+        
+        <p:outputLabel value="#{uimess['col.ebtxt']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('ebtxt')}"/>
+        
+        <p:outputLabel value="#{uimess['col.matnr']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('matnr')}"/>
+        
+        <p:outputLabel value="#{uimess['col.mat_txt']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('mat_txt')}"/>
+        
+        <p:outputLabel value="#{uimess['col.gbeextwg_ebx']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('gbeextwg_ebx')}"/>
+        
+        <p:outputLabel value="#{uimess['col.refbt']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('refbt')}"/>
+        
+        <p:outputLabel value="#{uimess['col.refgj']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('refgj')}"/>
+        
+        <p:outputLabel value="#{uimess['col.refbn']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('refbn')}"/>
+        
+        <p:outputLabel value="#{uimess['col.stokz']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('stokz')}"/>
+        
+        <p:outputLabel value="#{uimess['col.awref_rev']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('awref_rev')}"/>
+        
+        <p:outputLabel value="#{uimess['col.gkoar']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('gkoar')}"/>
+        
+        <p:outputLabel value="#{uimess['col.gkont']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('gkont')}"/>
+        
+        <p:outputLabel value="#{uimess['col.gkont_ltxt']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('gkont_ltxt')}"/>
+        
+        <p:outputLabel value="#{uimess['col.zz_lif']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('zz_lif')}"/>
+        
+        <p:outputLabel value="#{uimess['col.wrgbtr']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('wrgbtr')}">
+            <f:convertNumber pattern="###,##0.00"/>
+        </h:outputText>
+        
+        <p:outputLabel value="#{uimess['col.kwaer']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('kwaer')}"/>
+        
+        <p:outputLabel value="#{uimess['col.wtgbtr']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('wtgbtr')}">
+            <f:convertNumber pattern="###,##0.00"/>
+        </h:outputText>
+        
+        <p:outputLabel value="#{uimess['col.twaer']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('twaer')}"/>
+        
+        <p:outputLabel value="#{uimess['col.mbgbtr']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('mbgbtr')}">
+            <f:convertNumber pattern="###,##0.00"/>
+        </h:outputText>
+        
+        <p:outputLabel value="#{uimess['col.meinb']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('meinb')}"/>
+        
+        <p:outputLabel value="#{uimess['col.usnam']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('usnam')}"/>
+        
+        <p:outputLabel value="#{uimess['col.wsdat']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('wsdat')}">
+            <f:convertDateTime type="date" dateStyle="short"/>
+        </h:outputText>
+        
+        <p:outputLabel value="#{uimess['col.budat']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('budat')}">
+            <f:convertDateTime type="date" dateStyle="short"/>
+        </h:outputText>
+        
+        <p:outputLabel value="#{uimess['col.bldat']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('bldat')}">
+            <f:convertDateTime type="date" dateStyle="short"/>
+        </h:outputText>
+        
+        <p:outputLabel value="#{uimess['col.cpudt']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('cpudt')}">
+            <f:convertDateTime type="date" dateStyle="short"/>
+        </h:outputText>
+        
+        <p:outputLabel value="#{uimess['col.user']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('mod_de')}"/>
+        
+        <p:outputLabel value="#{uimess['col.time']}" for="@next"/>
+        <h:outputText value="#{ksb1.selected[0].get('mod_timp')}">
+            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+        </h:outputText>
+    </p:panelGrid>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+    </script>
+</ui:composition>

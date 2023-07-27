@@ -1,0 +1,8 @@
+/target/
+/nbproject/
+/init_data_load/
+/documentation/
+admin-keyfile
+domain-passwords
+domainANY.xml
+domainSales.xml

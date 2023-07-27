@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions">
+    
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['prsmtrx.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['prsmtrx.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <c:if test="#{not empty prsmtrxlist.initError}">
+            <p:staticMessage severity="warn" detail="#{prsmtrxlist.initError}"/>
+            <script type="text/javascript">
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty prsmtrxlist.initError}">
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+            </style>
+
+            <h:form id='list'>
+                <p:dataTable id='tabela' widgetVar="tabela" value='#{prsmtrxlist.list}' var='item' reflow="true">
+                    
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column rowspan="2" headerText="#{uimess['col.id']}"/>
+                            <p:column colspan="2" headerText="#{uimess['col.sapoper']}"/>
+                            <p:column colspan="2" headerText="#{uimess['col.trz_original']}"/>
+                            <p:column colspan="2" headerText="#{uimess['col.sapdoctip']}"/>
+                            <p:column rowspan="2" headerText="#{uimess['col.syst_logic']}" style="white-space: pre-wrap;"/>
+                            <p:column colspan="2" headerText="#{uimess['col.operatie']}"/>
+                            <p:column rowspan="2" headerText="#{uimess['col.blocat']}"/>
+                            <p:column rowspan="2" headerText="#{uimess['col.ordine']}"/>
+                            <p:column rowspan="2" headerText="#{uimess['col.user']}"/>
+                            <p:column rowspan="2" headerText="#{uimess['col.time']}"/>
+                        </p:row>
+                        <p:row>
+                            <p:column headerText="#{uimess['col.cod']}"/>
+                            <p:column headerText="#{uimess['col.nume']}"/>
+                            
+                            <p:column headerText="#{uimess['col.cod']}"/>
+                            <p:column headerText="#{uimess['col.nume']}"/>
+                            
+                            <p:column headerText="#{uimess['col.cod']}"/>
+                            <p:column headerText="#{uimess['col.nume']}"/>
+                            
+                            <p:column headerText="#{uimess['col.cod']}"/>
+                            <p:column headerText="#{uimess['col.nume']}"/>
+                        </p:row>
+                    </p:columnGroup>
+                    
+                    <p:column>
+                        <h:outputText value="#{fn:substring(item.id, 0, 8)}"/>
+                    </p:column>
+
+                    <p:column>
+                        <h:outputText value="#{item.sap_oper}"/>
+                    </p:column>                    
+                    <p:column>
+                        <h:outputText value="#{item.sap_oper_nume}"/>
+                    </p:column>
+                    
+                    <p:column>
+                        <h:outputText value="#{item.sap_tranz}"/>
+                    </p:column>                    
+                    <p:column>
+                        <h:outputText value="#{item.sap_tranz_nume}"/>
+                    </p:column>
+                    
+                    <p:column>
+                        <h:outputText value="#{item.doc_tip}"/>
+                    </p:column>                    
+                    <p:column>
+                        <h:outputText value="#{item.doc_tip_nume}"/>
+                    </p:column>
+                    
+                    <p:column>
+                        <h:outputText value="#{item.syst_logic}"/>
+                    </p:column>
+                    
+                    <p:column>
+                        <h:outputText value="#{item.app_oper}"/>
+                    </p:column>                    
+                    <p:column>
+                        <h:outputText value="#{item.app_oper_nume}"/>
+                    </p:column>
+                    
+                    <p:column>
+                        <span class="#{item.blocat ? 'fa fa-check': ''}"></span>
+                    </p:column>
+                    
+                    <p:column style="text-align: right;">
+                        <h:outputText value="#{item.ordine}"/>
+                    </p:column>
+
+                    <p:column>
+                        <h:outputText value="#{item.mod_de}"/>
+                    </p:column>
+
+                    <p:column>
+                        <h:outputText value="#{item.mod_timp}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+
+            <script type="text/javascript">
+            /*<![CDATA[*/
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+            /*]]>*/
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>
