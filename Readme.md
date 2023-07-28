@@ -27,7 +27,7 @@
 - Weld CDI
 - Docker
 
-# Screen captures
+# Screenshots
 
 ### Cloud resource overview
 ![azure resources](./screenshots/azure-resources.png)
