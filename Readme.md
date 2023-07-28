@@ -15,6 +15,7 @@
 - .xlsx/ .csv/ .txt files upload/ download
 - MS SQL server backend
 - Bilingual UX
+- Responsive UX
 
 ## Dependencies
 - Glassfish Application Server
@@ -34,5 +35,5 @@
 ### ML Model list
 ![ML model list](./capture/opexal_1.png)
 
-### Calssified records
+### Classified records
 ![classified records](./capture/opexal_2.png)
