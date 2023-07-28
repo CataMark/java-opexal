@@ -30,10 +30,10 @@
 # Screen captures
 
 ### Cloud resource overview
-![azure resources](./capture/azure-resources.png)
+![azure resources](./screenshots/azure-resources.png)
 
 ### ML Model list
-![ML model list](./capture/opexal_1.png)
+![ML model list](./screenshots/opexal_1.png)
 
 ### Classified records
-![classified records](./capture/opexal_2.png)
+![classified records](./screenshots/opexal_2.png)
