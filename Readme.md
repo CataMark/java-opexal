@@ -25,3 +25,14 @@
 - JavaFaces
 - Weld CDI
 - Docker
+
+# Screen captures
+
+### Cloud resource overview
+![azure resources](./capture/azure-resources.png)
+
+### ML Model list
+![ML model list](./capture/opexal_1.png)
+
+### Calssified records
+![classified records](./capture/opexal_2.png)
